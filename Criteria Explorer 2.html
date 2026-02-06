@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYP Sciences Interactive Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #284D7A;
+      --secondary: #20B8AA;
+      --accent: #56F0B9;
+      --bg: #E9EBED;
+      --white: #ffffff;
+      --text: #1a3652;
+      --muted: #8e9aaf;
+      --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg);
+      background: linear-gradient(-45deg, #E9EBED, #f4f5f7, #E9EBED);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      flex-direction: column; 
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .top-banner {
+      background-color: var(--white);
+      padding: 25px 20px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      z-index: 20;
+      position: relative;
+    }
+
+    .attribution {
+      position: absolute;
+      top: 50%;
+      right: 40px;
+      transform: translateY(-50%);
+      text-align: right;
+      font-size: 0.65rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .attribution b {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem; /* ~2 sizes larger than 0.75rem */
+      font-weight:600;
+    }
+
+    .banner-small {
+      display: block;
+      font-size:1.0rem;
+      color: var(--primary);
+      text-transform: none;
+      margin-bottom: 2px;
+      letter-spacing: 1px;
+    }
+
+    .banner-bold {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .app-container { display: flex; flex: 1; overflow: hidden; }
+
+    .sidebar {
+      width: 280px;
+      background-color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 15px;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .nav-item {
+      padding: 15px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      border-left: 4px solid transparent;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.08); }
+
+    .nav-item.active {
+      background: var(--white);
+      color: var(--primary);
+      border-left: 4px solid var(--secondary);
+    }
+
+    .explorer-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .header {
+      padding: 20px 40px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .header h1 { margin: 0; font-size: 1.2rem; color: var(--primary); }
+
+    .content-layout { display: flex; flex: 1; overflow: hidden; }
+
+    .strands-column {
+      width: 360px;
+      background: rgba(255, 255, 255, 0.3);
+      border-right: 1px solid rgba(0,0,0,0.05);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .strand-card {
+      padding: 20px;
+      background: var(--white);
+      border-radius: 15px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .strand-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+    .strand-card.active { border-color: var(--secondary); background: #f0fdfa; }
+
+    .strand-id-tag {
+      font-size: 0.7rem;
+      color: var(--secondary);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .detail-column { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+
+    .detail-card {
+      background: var(--white);
+      padding: 40px;
+      border-radius: 25px;
+      box-shadow: 0 20px 50px rgba(40, 77, 122, 0.08);
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .quote-box {
+      background: #f8fafc;
+      border-left: 4px solid var(--secondary);
+      padding: 15px 20px;
+      margin: 15px 0;
+      font-style: italic;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .explanation-box {
+      line-height: 1.8;
+      color: #334155;
+      font-size: 1.05rem;
+      margin-top: 15px;
+    }
+
+    .ai-btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .ai-btn {
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition);
+    }
+
+    .ai-btn:hover { border-color: var(--secondary); background: #f0fdfa; transform: translateY(-2px); }
+
+    .ai-btn strong { display: block; color: var(--primary); margin-bottom: 5px; font-size: 0.95rem; }
+
+    .response-area {
+      margin-top: 30px;
+      padding: 30px;
+      background: #fff;
+      border: 2px solid #f0fdfa;
+      border-radius: 20px;
+      display: none;
+      line-height: 1.7;
+      color: #334155;
+    }
+
+    .footer-disclaimer {
+      padding: 10px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.4);
+      z-index: 20;
+    }
+
+    /* AI Response Formatting */
+    .formatted-content h3 { color: var(--primary); margin: 0 0 15px 0; font-size: 1.2rem; }
+    .formatted-content p { margin-bottom: 15px; }
+    .formatted-content ul { padding-left: 20px; margin-bottom: 15px; }
+    .formatted-content li { margin-bottom: 10px; }
+    .formatted-content .sample-answer { 
+      background: #f1f5f9; 
+      padding: 25px; 
+      border-radius: 15px; 
+      border-left: 6px solid var(--primary);
+      margin-top: 25px;
+    }
+
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--secondary);
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 12px;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    @media (max-width: 900px) {
+      .app-container { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; }
+      .strands-column { width: 100%; height: 250px; border-right: none; border-bottom: 1px solid #eee; }
+      .ai-btn-group { grid-template-columns: 1fr; }
+      .attribution { position: static; text-align: center; margin-top: 15px; transform: none; right: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-banner">
+    <div class="attribution">
+      Created by<br>
+      <b>DINAKAR SUBRAMANI</b>
+      CC BY-NC
+    </div>
+    <span class="banner-small">MYP Science</span>
+    <span class="banner-bold">Assessment criterion explorer</span>
+  </header>
+
+  <div class="app-container">
+    <aside class="sidebar" id="sidebarNav"></aside>
+    <main class="explorer-main">
+      <header class="header">
+        <h1 id="mainTitle">Select a Criterion</h1>
+      </header>
+      <div class="content-layout">
+        <div class="strands-column" id="strandsList"></div>
+        <div class="detail-column" id="detailView">
+          <div style="color: #a0aec0; text-align: center; margin-top: 100px;">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3; margin-bottom: 20px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+            <h3>Explorer Guide</h3>
+            <p>Select a criterion and strand to see requirements and get AI help.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer-disclaimer">
+    This tool uses Google Gemini for its AI features. It can make mistakes.
+  </footer>
+
+  <script>
+    const apiKey = "AIzaSyBtPxSM2VMKCZmop961d0oOQEVKHZALNwk"; 
+
+    const scienceData = {
+      A: { 
+        title: "Criterion A: Knowing and Understanding", 
+        strands: [
+          { id: "i", short: "Explain scientific knowledge", quote: "explain scientific knowledge", explanation: "Students must move beyond simple descriptions to provide detailed, reasoned accounts of scientific theories and concepts." },
+          { id: "ii", short: "Apply knowledge to solve problems", quote: "apply scientific knowledge and understanding to solve problems set in familiar and unfamiliar situations", explanation: "Students are required to demonstrate adaptability by applying classroom concepts to solve complex problems in both standard and new, real-world contexts." },
+          { id: "iii", short: "Analyse and evaluate information", quote: "analyse and evaluate information to make scientifically supported judgments.", explanation: "Students must critically examine data to form logical conclusions that are backed by scientific evidence." }
+        ]
+      },
+      B: { 
+        title: "Criterion B: Inquiring and Designing", 
+        max: "Maximum: 8",
+        strands: [
+          { id: "i", short: "Explain the problem (Research question)", quote: "explain a problem or question to be tested by a scientific investigation", explanation: "Students must clearly articulate the purpose of their research, justifying the specific problem or question they intend to investigate." },
+          { id: "ii", short: "Formulate and explain a hypothesis", quote: "formulate and explain a testable hypothesis using correct scientific reasoning", explanation: "Students should develop a predictive statement that can be tested and provide a logical scientific rationale for their expectations." },
+          { id: "iii", short: "Manipulation of variables and collection of data", quote: "explain how to manipulate the variables, and explain how sufficient, relevant data will be collected", explanation: "Students must provide a detailed plan for controlling variables and outline a methodology that ensures the data collected is both high-quality and relevant." },
+          { id: "iv", short: "Design a logical and safe method", quote: "design a logical, complete and safe method in which they select appropriate materials and equipment.", explanation: "Students are expected to draft a professional, step-by-step experimental procedure that prioritizes safety and the correct use of scientific tools." }
+        ]
+      },
+      C: { 
+        title: "Criterion C: Processing and Evaluating", 
+        max: "Maximum: 8",
+        strands: [
+          { id: "i", short: "Collect, organize, and transform data", quote: "correctly collect, organize, transform and present data in numerical and/or visual forms", explanation: "Students must demonstrate precision in gathering data and translating it into professional formats such as tables, charts, or graphs." },
+          { id: "ii", short: "Interpret data and explain results", quote: "accurately interpret data and explain results using correct scientific reasoning", explanation: "Students are required to identify trends within their data and explain the significance of these findings using accurate scientific principles." },
+          { id: "iii", short: "Evaluate the hypothesis", quote: "evaluate the validity of a hypothesis based on the outcome of a scientific investigation", explanation: "Students must critically assess whether the evidence from their experiment supports or refutes their original prediction." },
+          { id: "iv", short: "Evaluate the method", quote: "evaluate the validity of the method based on the outcome of a scientific investigation", explanation: "Students should analyze the effectiveness of their experimental process, identifying strengths and weaknesses in their methodology." },
+          { id: "v", short: "Explain improvements or extensions", quote: "explain improvements or extensions to the method that would benefit the scientific investigation.", explanation: "Students must propose specific, reasoned modifications or further research paths to improve the reliability and depth of their findings." }
+        ]
+      },
+      D: { 
+        title: "Criterion D: Reflecting on the Impacts of Science", 
+        max: "Maximum: 8",
+        strands: [
+          { id: "i", short: "Explain the ways science is applied", quote: "explain the ways in which science is applied and used to address a specific problem or issue", explanation: "Students must provide a thorough account of how scientific innovation is used to tackle particular global or local challenges." },
+          { id: "ii", short: "Discuss and evaluate implications", quote: "discuss and evaluate the implications of using science and its application to solve a specific problem or issue, interacting with a factor", explanation: "Students are required to weigh the consequences—such as ethical, social, or environmental impacts—of scientific solutions." },
+          { id: "iii", short: "Consistently apply scientific language", quote: "consistently apply scientific language to communicate understanding clearly and precisely", explanation: "Students must maintain a professional standard of communication, using scientific terminology accurately throughout their work." },
+          { id: "iv", short: "Document sources completely", quote: "document sources completely.", explanation: "Students must practice full academic integrity by providing exhaustive and accurate citations for all research and external information used." }
+        ]
+      }
+    };
+
+    let currentCritKey = null;
+
+    function init() {
+      const nav = document.getElementById('sidebarNav');
+      Object.keys(scienceData).forEach(key => {
+        const div = document.createElement('div');
+        div.className = 'nav-item';
+        div.innerHTML = `<strong>Criterion ${key}</strong><br><small>${scienceData[key].title.split(': ')[1]}</small>`;
+        div.onclick = () => selectCrit(key, div);
+        nav.appendChild(div);
+      });
+    }
+
+    function selectCrit(key, el) {
+      currentCritKey = key;
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('mainTitle').innerText = scienceData[key].title;
+      renderStrands(key);
+      document.getElementById('detailView').innerHTML = `<div style="color: #a0aec0; text-align: center; margin-top: 100px;"><h3>Strand Selection</h3><p>Choose a specific strand from the middle column.</p></div>`;
+    }
+
+    function renderStrands(key) {
+      const list = document.getElementById('strandsList');
+      list.innerHTML = '';
+      scienceData[key].strands.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'strand-card';
+        div.innerHTML = `<span class="strand-id-tag">Strand ${s.id}</span><strong>${s.short}</strong>`;
+        div.onclick = () => showDetail(s, div);
+        list.appendChild(div);
+      });
+    }
+
+    function showDetail(strand, el) {
+      document.querySelectorAll('.strand-card').forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+      
+      const detail = document.getElementById('detailView');
+      detail.innerHTML = `
+        <div class="detail-card">
+          <small style="color:var(--secondary); text-transform: uppercase; font-weight:700;">Criterion ${currentCritKey} | Strand ${strand.id}</small>
+          <h2 style="margin: 10px 0 5px 0; color: var(--primary); font-size: 1.4rem;">${strand.short}</h2>
+          
+          <div class="quote-box">"${strand.quote}"</div>
+          
+          <div class="explanation-box">
+            <strong>Explanation:</strong><br>
+            ${strand.explanation}
+          </div>
+          
+          <div class="ai-btn-group">
+            <button class="ai-btn" onclick="askAI('understand', '${strand.id}', '${strand.short.replace(/'/g, "\\'")}')">
+              <strong>Help Me Understand</strong>
+              <span>Short analogy (3-4 lines)</span>
+            </button>
+            <button class="ai-btn" onclick="askAI('question', '${strand.id}', '${strand.short.replace(/'/g, "\\'")}')">
+              <strong>Sample Question</strong>
+              <span>Practice task & answer</span>
+            </button>
+          </div>
+          
+          <div id="aiResponse" class="response-area formatted-content"></div>
+        </div>
+      `;
+    }
+
+    async function askAI(type, strandId, strandTitle) {
+      const responseBox = document.getElementById('aiResponse');
+      responseBox.style.display = 'block';
+      responseBox.innerHTML = `<div class="loading-spinner"></div> Thinking...`;
+
+      if (!apiKey) {
+        responseBox.innerHTML = `<div style="color:#e11d48; background:#fff1f2; padding:20px; border-radius:12px; border:1px solid #fda4af;"><strong>API Key Required:</strong> Paste your Google Gemini API key into the <code>const apiKey = "";</code> variable in the script.</div>`;
+        return;
+      }
+
+      const systemPrompt = type === 'understand' 
+        ? "You are an expert IB MYP Science teacher. Your explanations must be strictly 3 to 4 lines long. Use a simple analogy. DO NOT use hashtags (#) or dashes (-) for layout. ABSOLUTELY NO markdown bolding like **text**. Use HTML tags like <h3> and <strong> instead."
+        : "You are an IB MYP Science examiner. Generate a practice question using a specific MYP topic and command terms. Provide a 'Sample Answer' inside a <div class=\"sample-answer\"> tag. DO NOT use hashtags (#), dashes (-), or double asterisks (**). Use HTML <h3> and <strong>.";
+
+      const userPrompt = type === 'understand'
+        ? `Explain Criterion ${currentCritKey}, Strand ${strandId}: "${strandTitle}" using a simple analogy. Keep it strictly to 3 or 4 lines of text. Use <h3> and <strong>. No asterisks.`
+        : `Generate an MYP Science practice question for Criterion ${currentCritKey}, Strand ${strandId}: "${strandTitle}". Wrap answer in <div class="sample-answer">. Use <h3> and <strong>. No asterisks.`;
+
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: userPrompt }] }],
+            systemInstruction: { parts: [{ text: systemPrompt }] }
+          })
+        });
+
+        const data = await response.json();
+        let rawText = data.candidates[0].content.parts[0].text;
+        
+        let clean = rawText
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+          .replace(/#{1,6}\s?(.*)/g, '<h3>$1</h3>') 
+          .replace(/^\s*[\-\*•]\s?(.*)/gm, '<li>$1</li>') 
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/\n/g, '<br>')
+          .replace(/[\*#_]/g, ''); 
+
+        if (clean.includes('<li>')) clean = clean.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+        responseBox.innerHTML = `<div class="ai-inner-content"><p>${clean}</p></div>`;
+      } catch (e) {
+        responseBox.innerHTML = "<div style='color:#e11d48'>Connection Error. Please check your API key.</div>";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
