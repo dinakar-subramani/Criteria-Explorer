@@ -303,7 +303,7 @@
   </footer>
 
   <script>
-    const apiKey = "AIzaSyAhzXz9uj871tPFfnJcfdXWGSmdI7xTSPI"; 
+    const apiKey = "AIzaSyCy2REakLmGoGFJdLKUXl9p4Zzk6X7Elhs"; 
 
     const scienceData = {
       A: { 
@@ -457,7 +457,7 @@
 
         responseBox.innerHTML = `<div class="ai-inner-content"><p>${clean}</p></div>`;
       } catch (e) {
-        responseBox.innerHTML = "<div style='color:#e11d48'>Connection Error. Please check your API key.</div>";
+        responseBox.innerHTML = "<div style='color:#e11d48'>Connection is busy. Please try again later.</div>";
       }
     }
 
@@ -465,5 +465,6 @@
   </script>
 </body>
 </html>
+
 
 
